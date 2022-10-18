@@ -19,6 +19,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #include "dialogs/ignorefiledialog.h"
 #include "dialogs/initdialog.h"
 #include "dialogs/mergedialog.h"
+#include "dialogs/mergerebasewizard.h"
 #include "dialogs/pulldialog.h"
 #include "dialogs/runnerdialog.h"
 #include "dialogs/switchbranchdialog.h"
@@ -469,6 +470,15 @@ ArgParserReturn CommandArgsParser::switch_checkout(const QString &path)
         runner.run(d.command());
         runner.exec();
     }
+    return 0;
+}
+
+ArgParserReturn CommandArgsParser::merge_rebase(const QString &path)
+{
+    checkGitPath(path);
+
+    MergeRebaseWizard w(git);
+    w.exec();
     return 0;
 }
 

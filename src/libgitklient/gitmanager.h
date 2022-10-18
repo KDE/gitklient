@@ -157,6 +157,10 @@ public:
     QString readNote(const QString &branchName) const;
     void saveNote(const QString &branchName, const QString &note) const;
 
+    QString mergeBase(const QString &branch1, const QString &branch2) const;
+    QStringList showCommitsAfter(const QString &branch, const QString &commitHash) const;
+    QString commitMessage(const QString &commitHash) const;
+
 Q_SIGNALS:
     void pathChanged();
 

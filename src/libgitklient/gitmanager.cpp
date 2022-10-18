@@ -378,6 +378,25 @@ void Manager::saveNote(const QString &branchName, const QString &note) const
     runGit({QStringLiteral("notes"), QStringLiteral("add"), branchName, QStringLiteral("-f"), QStringLiteral("--message=") + note});
 }
 
+QString Manager::mergeBase(const QString &branch1, const QString &branch2) const
+{
+    auto buffer = readAllNonEmptyOutput({"merge-base", branch1, branch2});
+    if (buffer.size())
+        return buffer.first();
+    return {};
+}
+
+QStringList Manager::showCommitsAfter(const QString &branch, const QString &commitHash) const
+{
+    return readAllNonEmptyOutput({"rev-list", commitHash + ".." + branch});
+    ///({"--no-pager", "log", branch, "--pretty=format:%H", "--after=" + commitHash, "--reverse"});
+}
+
+QString Manager::commitMessage(const QString &commitHash) const
+{
+    return readAllNonEmptyOutput({"--no-pager", "log", "-n", "1", "--pretty=format:%s", commitHash}).join('\n');
+}
+
 Manager::Manager()
     : QObject()
     , _remotesModel{new RemotesModel(this)}

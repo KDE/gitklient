@@ -136,6 +136,19 @@ target_sources(libgitklientgui PRIVATE
     dialogs/taginfodialog.h
     dialogs/cleanupdialog.cpp
     dialogs/cleanupdialog.h
+    dialogs/mergerebasewizard.h
+    dialogs/mergerebasewizard.cpp
+
+    graphview/group.cpp
+    graphview/group.h
+    graphview/itemlist.cpp
+    graphview/itemlist.h
+    graphview/line.cpp
+    graphview/line.h
+    graphview/node.cpp
+    graphview/node.h
+    graphview/scene.cpp
+    graphview/scene.h
 
     appwindow.cpp
     buttonsgroup.cpp
@@ -225,6 +238,7 @@ ki18n_wrap_ui(
     dialogs/initdialog.ui
     dialogs/notedialog.ui
     dialogs/cleanupdialog.ui
+    dialogs/mergerebasewizard.ui
 )
 
 target_link_libraries(libgitklientgui
