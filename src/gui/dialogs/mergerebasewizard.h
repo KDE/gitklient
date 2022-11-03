@@ -35,6 +35,9 @@ private Q_SLOTS:
     void node_clicked();
     void showHideItems();
 
+public Q_SLOTS:
+    void done(int code) override;
+
 private:
     Git::Manager *mGit;
     GraphView::Scene *scene;
@@ -54,7 +57,6 @@ private:
     static constexpr int PosCurrent{0};
     static constexpr int PosBase{1};
     static constexpr int PosOther{2};
-
 };
 
 #endif // MERGEREBASEWIZARD_H

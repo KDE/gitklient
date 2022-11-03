@@ -5,6 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 */
 
 #include "mergerebasewizard.h"
+#include "runnerdialog.h"
 
 #include "commands/commandmerge.h"
 #include "commands/commandrebase.h"
@@ -70,6 +71,9 @@ void MergeRebaseWizard::node_clicked()
         selectedNode->setIsSelected(false);
     auto node = qobject_cast<Node *>(sender());
     auto log = static_cast<Git::Log *>(node->data());
+
+    if (!log)
+        qWarning() << "Log not found" << node->data();
     logDetails->setLog(log);
 
     node->setIsSelected(true);
@@ -90,6 +94,16 @@ void MergeRebaseWizard::showHideItems()
     mCurrentStateItems.setVisible(!radioButtonMerge->isChecked() && !radioButtonRebase->isChecked());
 }
 
+void MergeRebaseWizard::done(int code)
+{
+    if (code == Accepted) {
+        auto cmd = command();
+        RunnerDialog d;
+        d.run(cmd);
+        d.exec();
+    }
+}
+
 Node *MergeRebaseWizard::addNodeAtCell(int row, int col, const QString &title)
 {
     auto node = scene->addNode(row, col, "");
@@ -104,8 +118,10 @@ Node *MergeRebaseWizard::addNodeForLog(int pos, int index, const QString &commit
     QString descript;
     if (log)
         descript = log->subject();
-    else
+    else {
         descript = mGit->commitMessage(commitHash);
+        qWarning() << "No log" << commitHash;
+    }
     n->setDescript(descript);
     n->setData(log);
     connect(n, &Node::clicked, this, &MergeRebaseWizard::node_clicked);
@@ -118,6 +134,7 @@ Git::AbstractCommand *MergeRebaseWizard::command() const
     if (radioButtonMerge->isChecked()) {
         auto cmd = new Git::CommandMerge(mGit);
         cmd->setFromBranch(comboBoxFrom->currentText());
+        cmd->setSquash(Git::checkStateToOptionalBool(checkBoxSquash->checkState()));
         return cmd;
     }
     if (radioButtonRebase->isChecked()) {

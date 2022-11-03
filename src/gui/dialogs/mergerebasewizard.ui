@@ -14,7 +14,8 @@
    <string>Rebase/Merge</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="gitklient"/>
+   <iconset theme="gitklient">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <layout class="QFormLayout" name="formLayout">
@@ -69,6 +70,9 @@
        <widget class="QCheckBox" name="checkBoxSquash">
         <property name="text">
          <string>Squash</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -316,24 +316,22 @@ Log *LogsModel::fromIndex(const QModelIndex &index) const
 
 QModelIndex LogsModel::findIndexByHash(const QString &hash) const
 {
-    int idx{0};
-    for (auto &log : mData)
-        if (log->commitHash() == hash)
-            return index(idx);
-        else
-            idx++;
-    return {};
+    auto i = std::find_if(mData.begin(), mData.end(), [&hash](Log *log) {
+        return log->commitHash() == hash;
+    });
+    if (i == mData.end())
+        return {};
+    return index(std::distance(mData.begin(), i));
 }
 
 Log *LogsModel::findLogByHash(const QString &hash) const
 {
-    int idx{0};
-    for (auto &log : mData)
-        if (log->commitHash() == hash)
-            return log;
-        else
-            idx++;
-    return nullptr;
+    auto i = std::find_if(mData.begin(), mData.end(), [&hash](Log *log) {
+        return log->commitHash() == hash;
+    });
+    if (i == mData.end())
+        return nullptr;
+    return *i;
 }
 
 void LogsModel::fill()
@@ -361,7 +359,7 @@ void LogsModel::fill()
     if (mBranch.size())
         args.insert(2, mBranch);
 
-    auto ret = QString(Manager::instance()->runGit(args));
+    auto ret = QString(mGit->runGit(args));
     if (ret.startsWith(QStringLiteral("fatal:")))
         return;
 
