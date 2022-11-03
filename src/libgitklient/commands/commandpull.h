@@ -71,6 +71,7 @@ private:
     Rebase mRebase{None};
     FastForward mFastForward{Unset};
 
+
 #ifdef GIT_GUI
     QWidget *mWidget;
     Ui::CommandPullWidget *mUi;
