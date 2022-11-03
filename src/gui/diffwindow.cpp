@@ -47,6 +47,7 @@ DiffWindow::DiffWindow(Git::Manager *git)
     mRightStorage = FileSystem;
     mRightDir = git->path();
     mDiffModel->sortItems();
+
 }
 
 DiffWindow::DiffWindow(const Git::File &oldFile, const Git::File &newFile)
@@ -163,6 +164,7 @@ void DiffWindow::fileOpen()
     if (d.exec() != QDialog::Accepted)
         return;
 
+    qDebug() << d.mode();
     mLeftStorage = mRightStorage = FileSystem;
     if (d.mode() == DiffOpenDialog::Dirs) {
         mLeftDir = d.oldDir();

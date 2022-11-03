@@ -70,6 +70,7 @@ void RunnerDialog::run(Git::AbstractCommand *command)
 void RunnerDialog::git_readyReadStandardOutput()
 {
     const auto buffer = mGitProcess->readAllStandardOutput();
+    mErrorOutput.append(buffer);
     qCDebug(GITKLIENT_LOG) << "OUT" << buffer;
     //    textBrowser->setTextColor(Qt::black);
     textBrowser->append(buffer);
@@ -81,6 +82,7 @@ void RunnerDialog::git_readyReadStandardOutput()
 void RunnerDialog::git_readyReadStandardError()
 {
     const auto buffer = mGitProcess->readAllStandardError();
+    mStandardOutput.append(buffer);
     qCDebug(GITKLIENT_LOG) << "ERROR" << buffer;
     //    textBrowser->setTextColor(Qt::red);
     textBrowser->append(buffer);
@@ -94,12 +96,39 @@ void RunnerDialog::git_finished(int exitCode, QProcess::ExitStatus exitStatus)
     Q_UNUSED(exitCode)
     pushButton->setText(i18n("Close"));
 
-    if (exitStatus == QProcess::CrashExit)
-        KMessageBox::error(this, i18n("The git process crashed"));
+    if (mCmd)
+        mCmd->parseOutput(mStandardOutput,mErrorOutput);
 
-    if (mCmd && mCmd->status() == Git::AbstractCommand::Error)
-        KMessageBox::error(this, mCmd->errorMessage());
+    bool isSuccessful = mCmd?mCmd->status()==Git::AbstractCommand::Finished:exitStatus==QProcess::NormalExit;
+    QString exitMessage;
+
+    if (isSuccessful) {
+        exitMessage=i18n("Process finished");
+    } else {
+        if (mCmd)
+            KMessageBox::error(this, mCmd->errorMessage());
+        else
+        KMessageBox::error(this, i18n("The git process crashed"));
+        exitMessage=i18n("Process finished with error");
+    }
 
     textBrowser->append(
-        QStringLiteral("Process finished: (Elapsed time: %1)").arg(QTime::fromMSecsSinceStartOfDay(mTimer.elapsed()).toString(QStringLiteral("HH:mm:ss"))));
+        QStringLiteral("%1: (Elapsed time: %2)").arg(exitMessage, QTime::fromMSecsSinceStartOfDay(mTimer.elapsed()).toString(QStringLiteral("HH:mm:ss"))));
+
+    if (mAutoClose){
+        if (isSuccessful)
+        accept();
+    else
+        setResult(QDialog::Rejected);
+    }
+}
+
+bool RunnerDialog::autoClose() const
+{
+    return mAutoClose;
+}
+
+void RunnerDialog::setAutoClose(bool newAutoClose)
+{
+    mAutoClose = newAutoClose;
 }

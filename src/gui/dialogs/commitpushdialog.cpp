@@ -183,7 +183,12 @@ void CommitPushDialog::slotPushButtonPushClicked()
         commitCommand.setAmend(checkBoxAmend->isChecked());
         commitCommand.setMessage(textEditMessage->toPlainText());
         commitCommand.setIncludeStatus(Git::checkStateToOptionalBool(checkBoxIncludeStatus->checkState()));
-        mGit->run(commitCommand);
+
+        RunnerDialog d(mGit, this);
+        d.setAutoClose(true);
+        d.run(&commitCommand);
+        if (d.exec()!=QDialog::Accepted)
+            return;
     }
 
     Git::CommandPush cmd;
