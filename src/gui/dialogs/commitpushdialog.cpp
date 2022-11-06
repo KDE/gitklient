@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: 2021 Hamed Masafi <hamed.masfi@gmail.com>
 
 SPDX-License-Identifier: GPL-3.0-or-later
-                                                 */
+*/
 
 #include "commitpushdialog.h"
 #include "GitKlientSettings.h"
@@ -14,6 +14,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <QPainter>
 
+// TODO: improve this method (Add cache)
 QIcon createIcon(const QColor &color)
 {
     QPixmap pixmap(32, 32);
@@ -33,8 +34,7 @@ QIcon createIcon(const QColor &color)
 
 void CommitPushDialog::reload()
 {
-    const auto files = mGit->changedFiles();
-
+ 
     QMap<Git::Manager::ChangeStatus, QIcon> icons;
 
     for (auto i = files.constBegin(); i != files.constEnd(); ++i) {
