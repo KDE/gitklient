@@ -11,14 +11,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #include <QObject>
 #include <QString>
 
-struct Command {
-    enum Type { Fixed, Named };
-
-    Type type;
-    QString s;
-    bool isOptional;
-};
-
 enum ParseReturnType { ExecApp, ReturnCode };
 
 struct ArgParserReturn {
@@ -26,12 +18,13 @@ struct ArgParserReturn {
     int code{0};
 
     ArgParserReturn() = default;
-    ArgParserReturn(int code)
+    explicit ArgParserReturn(int code)
         : type{ReturnCode}
         , code{code}
     {
     }
-    ArgParserReturn(ParseReturnType type)
+
+    explicit ArgParserReturn(ParseReturnType type)
         : type{type}
         , code{0}
     {
@@ -43,24 +36,20 @@ namespace Git
 class Manager;
 }
 
-using CommandList = QList<Command>;
-
-#define HelpText(name, text) Q_CLASSINFO("help." #name, text);
+#define HelpText(name, text) Q_CLASSINFO("help." #name, text)
 class LIBGITKLIENTGUI_EXPORT CommandArgsParser : public QObject
 {
     Q_OBJECT
 
-    QMap<QString, CommandList> mCommands;
     QMap<QString, QString> mParams;
     Git::Manager *git = nullptr;
     QMap<QString, QString> mHelpTexts;
 
-    HelpText(clone, "Clone an repo")
+    HelpText(clone, "Clone an repo");
 
-        public : CommandArgsParser();
-    void add(const QString &name, const CommandList &list);
-    void add(const QString &name, const QString &list);
-    bool check(const CommandList &commands);
+public:
+    CommandArgsParser();
+
     QString checkAll();
     QString param(const QString &name) const;
     ArgParserReturn run(const QStringList &args);

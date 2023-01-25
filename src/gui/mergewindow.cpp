@@ -31,11 +31,11 @@ bool isEmpty(const QStringList &list)
     if (list.isEmpty())
         return true;
 
-    for (const auto &s : list)
-        if (!s.trimmed().isEmpty())
-            return false;
-    return true;
+    return !std::any_of(list.begin(), list.end(), [](const QString &s) {
+        return !s.trimmed().isEmpty();
+    });
 }
+
 void compare(QTextEdit *e1, QTextEdit *e2)
 {
     auto m = qMin(e1->document()->blockCount(), e2->document()->blockCount());
@@ -47,6 +47,7 @@ void compare(QTextEdit *e1, QTextEdit *e2)
         }
     }
 }
+
 QString readFile(const QString &filePath)
 {
     QFile f{filePath};
@@ -390,10 +391,9 @@ void MergeWindow::doMergeAction(Diff::MergeType type)
 
 bool MergeWindow::isFullyResolved() const
 {
-    for (const auto &d : std::as_const(mDiffs))
-        if (d->mergeType == Diff::None && d->type == Diff::SegmentType::DifferentOnBoth)
-            return false;
-    return true;
+    return !std::any_of(mDiffs.begin(), mDiffs.end(), [](Diff::MergeSegment *d) {
+        return d->mergeType == Diff::None && d->type == Diff::SegmentType::DifferentOnBoth;
+    });
 }
 
 void MergeWindow::closeEvent(QCloseEvent *event)

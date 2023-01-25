@@ -47,10 +47,7 @@ int maxIn(int first, int second)
     if (first > second)
         return 1;
 
-    if (second > first)
-        return 2;
-
-    return 4;
+    return 2;
 }
 
 int maxIn(const QList<int> &list)

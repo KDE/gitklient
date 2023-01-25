@@ -208,14 +208,14 @@ void TreeModel::addData(const QStringList &data, const QString &prefix, bool spl
 
             auto parts = nodePath.split(mSeparator);
             if (mLastPartAsData) {
-                auto data = parts.takeLast();
+                auto d = parts.takeLast();
                 if (mShowRoot)
                     node = createPath(QStringList() << mSeparator << parts);
                 else
                     node = createPath(parts);
 
                 if (mShowRoot && node != mRootNode)
-                    node->data.append(data);
+                    node->data.append(d);
                 auto nodePathParts = nodePath.split(mSeparator);
                 nodePathParts.takeLast();
                 node->key = nodePathParts.join(mSeparator);

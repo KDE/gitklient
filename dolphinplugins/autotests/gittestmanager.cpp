@@ -12,8 +12,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #include <QUuid>
 
 GitTestManager::GitTestManager()
+    : mPath{QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QLatin1Char('/') + QUuid::createUuid().toString(QUuid::Id128) + "/"}
 {
-    mPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QLatin1Char('/') + QUuid::createUuid().toString(QUuid::Id128) + "/";
     QDir d;
     d.mkpath(mPath);
 }
@@ -31,6 +31,7 @@ bool GitTestManager::touch(const QString &fileName)
 bool GitTestManager::run(const QString &cmd)
 {
     auto parts = cmd.split(QLatin1Char(' '));
+    Q_UNUSED(parts)
     return true;
 }
 

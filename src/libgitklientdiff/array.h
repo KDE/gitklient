@@ -20,6 +20,10 @@ class Array2
 
 public:
     Array2(int c1, int c2);
+    Array2(const Array2 &other);
+
+    Array2 operator=(const Array2 &other);
+
     ~Array2();
 
     Q_ALWAYS_INLINE T &operator()(int i1, int i2);
@@ -33,6 +37,24 @@ Q_OUTOFLINE_TEMPLATE Array2<T>::Array2(int c1, int c2)
     , c2(c2)
 {
     _data = new T[c1 * c2];
+}
+
+template<typename T>
+Q_OUTOFLINE_TEMPLATE Array2<T>::Array2(const Array2 &other)
+    : _data{other._data}
+    , c1{other.c1}
+    , c2{other.c2} // TODO: implicit sharing maybe need for this class
+{
+}
+
+template<typename T>
+Q_OUTOFLINE_TEMPLATE Array2<T> Array2<T>::operator=(const Array2 &other)
+{
+    Array2<T> ret;
+    ret._data = _data;
+    ret.c1 = c1;
+    ret.c2 = c2;
+    return ret;
 }
 
 template<typename T>

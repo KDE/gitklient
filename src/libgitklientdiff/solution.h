@@ -37,7 +37,7 @@ public:
         Result(int oldStart, int oldSize, int newStart, int newSize, bool success, SegmentType type);
     };
 
-    SolutionIterator(const Solution &solution);
+    explicit SolutionIterator(const Solution &solution);
     void begin();
     Result pick();
 };

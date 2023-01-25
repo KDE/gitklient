@@ -54,7 +54,7 @@ constexpr int InvalidPath = 1;
             git->setPath(path);                                                                                                                                \
         if (!git->isValid()) {                                                                                                                                 \
             KMessageBox::error(nullptr, i18n("The path is not git repo: %1", path));                                                                           \
-            return 1;                                                                                                                                          \
+            return ArgParserReturn{1};                                                                                                                         \
         }                                                                                                                                                      \
     } while (false)
 
@@ -62,62 +62,6 @@ CommandArgsParser::CommandArgsParser()
     : QObject()
 {
     git = new Git::Manager;
-}
-
-void CommandArgsParser::add(const QString &name, const CommandList &list)
-{
-    mCommands.insert(name, list);
-}
-
-void CommandArgsParser::add(const QString &name, const QString &list)
-{
-    CommandList cmdList;
-    const auto parts = list.split(QLatin1Char(' '));
-    for (const auto &pp : parts) {
-        auto p = pp;
-        bool isOptional{false};
-        if (p.startsWith(QLatin1String("[")) && p.endsWith(QLatin1String("]"))) {
-            isOptional = true;
-            p = p.mid(1, p.length() - 2);
-        }
-
-        if (p.startsWith(QLatin1Char('<')) && p.endsWith(QLatin1Char('>')))
-            cmdList.append({Command::Named, p.mid(1, p.length() - 2), isOptional});
-        else
-            cmdList.append({Command::Fixed, p, isOptional});
-    }
-    add(name, cmdList);
-}
-
-bool CommandArgsParser::check(const CommandList &commands)
-{
-    mParams.clear();
-    if (qApp->arguments().size() != commands.size() + 1)
-        return false;
-    const auto appArgs = qApp->arguments();
-
-    int idx{1};
-    for (const auto &cmd : commands) {
-        switch (cmd.type) {
-        case Command::Fixed:
-            if (appArgs[idx] != cmd.s)
-                return false;
-            break;
-        case Command::Named:
-            mParams.insert(cmd.s, appArgs[idx]);
-            break;
-        }
-        idx++;
-    }
-    return true;
-}
-
-QString CommandArgsParser::checkAll()
-{
-    for (auto i = mCommands.begin(); i != mCommands.end(); ++i)
-        if (check(i.value()))
-            return i.key();
-    return {};
 }
 
 QString CommandArgsParser::param(const QString &name) const
@@ -191,7 +135,7 @@ ArgParserReturn CommandArgsParser::help()
         qCDebug(GITKLIENT_LOG).noquote() << "    " << method.name() << method.parameterNames().join(" ");
         qCDebug(GITKLIENT_LOG).noquote() << mHelpTexts.value(method.name());
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::clone()
@@ -206,7 +150,7 @@ ArgParserReturn CommandArgsParser::clone()
         r.exec();
         cmd->deleteLater();
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::clone(const QString &path)
@@ -222,7 +166,7 @@ ArgParserReturn CommandArgsParser::clone(const QString &path)
         r.exec();
         cmd->deleteLater();
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::init(const QString &path)
@@ -234,13 +178,13 @@ ArgParserReturn CommandArgsParser::init(const QString &path)
         QDir dir;
         if (!dir.mkpath(d.path())) {
             KMessageBox::error(nullptr, i18n("Unable to create path: %1", d.path()), i18n("Init repo"));
-            return 1;
+            return ArgParserReturn{1};
         }
 
         git->init(d.path());
         KMessageBox::information(nullptr, i18n("The repo inited successfully"));
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::pull(const QString &path)
@@ -248,7 +192,7 @@ ArgParserReturn CommandArgsParser::pull(const QString &path)
     git->setPath(path);
     PullDialog d(git);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::fetch(const QString &path)
@@ -256,7 +200,7 @@ ArgParserReturn CommandArgsParser::fetch(const QString &path)
     git->setPath(path);
     FetchDialog d(git);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::push(const QString &path)
@@ -265,7 +209,7 @@ ArgParserReturn CommandArgsParser::push(const QString &path)
 
     CommitPushDialog d(git);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::merge(const QString &path)
@@ -273,7 +217,7 @@ ArgParserReturn CommandArgsParser::merge(const QString &path)
     git->setPath(path);
 
     if (!git->isValid())
-        return Errors::InvalidPath;
+        return ArgParserReturn{Errors::InvalidPath};
 
     MergeDialog d(git);
     if (d.exec() == QDialog::Accepted) {
@@ -284,7 +228,7 @@ ArgParserReturn CommandArgsParser::merge(const QString &path)
         r.exec();
         cmd->deleteLater();
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::changes()
@@ -293,7 +237,7 @@ ArgParserReturn CommandArgsParser::changes()
     git->setPath(dir.currentPath());
     ChangedFilesDialog d(git);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::changes(const QString &path)
@@ -303,7 +247,7 @@ ArgParserReturn CommandArgsParser::changes(const QString &path)
     git->setPath(fi.isFile() ? fi.absoluteFilePath() : fi.absolutePath());
     ChangedFilesDialog d(git);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::create_tag(const QString &path)
@@ -315,14 +259,14 @@ ArgParserReturn CommandArgsParser::create_tag(const QString &path)
     if (d.exec() == QDialog::Accepted) {
         git->createTag(d.tagName(), d.message());
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::diff()
 {
     auto d = new DiffWindow();
     d->exec();
-    return ExecApp;
+    return ArgParserReturn{ExecApp};
 }
 
 ArgParserReturn CommandArgsParser::diff(const QString &file)
@@ -338,14 +282,14 @@ ArgParserReturn CommandArgsParser::diff(const QString &file)
         const Git::File changedFile(git, git->currentBranch(), dir.relativeFilePath(file));
         auto d = new DiffWindow(headFile, changedFile);
         d->exec();
-        return ExecApp;
+        return ArgParserReturn{ExecApp};
     } else if (fi.isDir()) {
         git->setPath(fi.absoluteFilePath());
         auto d = new DiffWindow(git);
         d->exec();
-        return ExecApp;
+        return ArgParserReturn{ExecApp};
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::diff(const QString &file1, const QString &file2)
@@ -360,31 +304,31 @@ ArgParserReturn CommandArgsParser::diff(const QString &file1, const QString &fil
         const Git::File fileRight(fi2.absoluteFilePath());
         auto d = new DiffWindow(fileLeft, fileRight);
         d->exec();
-        return ExecApp;
+        return ArgParserReturn{ExecApp};
     }
     if (fi1.isDir() && fi2.isDir()) {
         auto d = new DiffWindow(fi1.absoluteFilePath(), fi2.absoluteFilePath());
         d->exec();
-        return ExecApp;
+        return ArgParserReturn{ExecApp};
     }
 
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::diff(const QString &path, const QString &file1, const QString &file2)
 {
     if (file1.count(QLatin1Char(':')) != 1 || file2.count(QLatin1Char(':')) != 1)
-        return 1;
+        return ArgParserReturn{1};
     git->setPath(path);
     if (!git->isValid())
-        return 1;
+        return ArgParserReturn{1};
     const auto parts1 = file1.split(QLatin1Char(':'));
     const auto parts2 = file2.split(QLatin1Char(':'));
     const Git::File fileLeft(git, parts1.first(), parts1.at(1));
     const Git::File fileRight(git, parts2.first(), parts2.at(1));
     auto d = new DiffWindow(fileLeft, fileRight);
     d->exec();
-    return ExecApp;
+    return ArgParserReturn{ExecApp};
 }
 
 ArgParserReturn CommandArgsParser::blame(const QString &file)
@@ -392,7 +336,7 @@ ArgParserReturn CommandArgsParser::blame(const QString &file)
     QFileInfo fi{file};
 
     if (!fi.exists() || !fi.isFile()) {
-        return 0;
+        return ArgParserReturn{0};
     }
 
     git->setLoadFlags(Git::LoadLogs);
@@ -401,24 +345,23 @@ ArgParserReturn CommandArgsParser::blame(const QString &file)
     const Git::File f(git, git->currentBranch(), file);
     FileBlameDialog d(git, f);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::history(const QString &file)
 {
     git->setPath(file.mid(0, file.lastIndexOf(QLatin1Char('/'))));
-    auto fileCopy = file;
-    fileCopy = file.mid(git->path().size() + 1);
+    auto fileCopy = file.mid(git->path().size() + 1); // TODO: write relative math generator
     FileHistoryDialog d(git, fileCopy);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::merge()
 {
     auto d = new MergeWindow(git);
     d->exec();
-    return ExecApp;
+    return ArgParserReturn{ExecApp};
 }
 
 ArgParserReturn CommandArgsParser::merge(const QString &base, const QString &local, const QString &remote, const QString &result)
@@ -432,16 +375,16 @@ ArgParserReturn CommandArgsParser::merge(const QString &base, const QString &loc
     int n = d->exec();
 
     if (n == QDialog::Accepted)
-        return 0;
+        return ArgParserReturn{0};
     else
-        return 1;
+        return ArgParserReturn{1};
 }
 
 ArgParserReturn CommandArgsParser::ignore(const QString &path)
 {
     QFileInfo fi(path);
     if (!fi.exists())
-        return 1;
+        return ArgParserReturn{1};
 
     if (fi.isDir())
         git->setPath(path);
@@ -449,11 +392,11 @@ ArgParserReturn CommandArgsParser::ignore(const QString &path)
         git->setPath(fi.absolutePath());
 
     if (!git->isValid())
-        return 1;
+        return ArgParserReturn{1};
 
     IgnoreFileDialog d(git, path);
     d.exec();
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::cleanup(const QString &path)
@@ -466,7 +409,7 @@ ArgParserReturn CommandArgsParser::cleanup(const QString &path)
         runner.run(d.command());
         runner.exec();
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::switch_checkout(const QString &path)
@@ -475,7 +418,7 @@ ArgParserReturn CommandArgsParser::switch_checkout(const QString &path)
 
     if (git->isMerging()) {
         KMessageBox::error(nullptr, i18n("Cannot switch branch while merging"), i18n("Switch branch"));
-        return 1;
+        return ArgParserReturn{1};
     }
     SwitchBranchDialog d(git);
     if (d.exec() == QDialog::Accepted) {
@@ -483,7 +426,7 @@ ArgParserReturn CommandArgsParser::switch_checkout(const QString &path)
         runner.run(d.command());
         runner.exec();
     }
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::diff_branches(const QString &path)
@@ -493,9 +436,9 @@ ArgParserReturn CommandArgsParser::diff_branches(const QString &path)
     if (d.exec() == QDialog::Accepted) {
         auto diffWin = new DiffWindow(git, d.oldBranch(), d.newBranch());
         diffWin->exec();
-        return 0;
+        return ArgParserReturn{0};
     }
-    return 1;
+    return ArgParserReturn{1};
 }
 
 ArgParserReturn CommandArgsParser::add(const QString &path)
@@ -504,7 +447,7 @@ ArgParserReturn CommandArgsParser::add(const QString &path)
 
     git->addFile(path);
     KMessageBox::information(nullptr, i18n("File(s) added to git successfully"));
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::remove(const QString &path)
@@ -515,19 +458,19 @@ ArgParserReturn CommandArgsParser::remove(const QString &path)
     git->removeFile(path, cached);
     KMessageBox::information(nullptr, i18n("File(s) removed from git successfully"));
 
-    return 0;
+    return ArgParserReturn{0};
 }
 
 ArgParserReturn CommandArgsParser::main()
 {
     auto window = AppWindow::instance();
     window->show();
-    return ExecApp;
+    return ArgParserReturn{ExecApp};
 }
 
 ArgParserReturn CommandArgsParser::main(const QString &path)
 {
     auto window = new AppWindow(path);
     window->show();
-    return ExecApp;
+    return ArgParserReturn{ExecApp};
 }

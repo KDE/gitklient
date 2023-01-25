@@ -55,9 +55,9 @@ void SearchDialog::slotPushButtonSearchClicked()
     pushButtonSearch->setEnabled(false);
     mProgress.total = mProgress.value = 0;
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    auto f = QtConcurrent::run(this, &SearchDialog::beginSearch);
+    QtConcurrent::run(this, &SearchDialog::beginSearch);
 #else
-    auto f = QtConcurrent::run(&SearchDialog::beginSearch, this);
+    QtConcurrent::run(&SearchDialog::beginSearch, this);
 #endif
 }
 

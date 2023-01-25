@@ -56,10 +56,13 @@ Remote *RemotesModel::fromIndex(const QModelIndex &index)
 
 Remote *RemotesModel::findByName(const QString &name)
 {
-    for (const auto &d : std::as_const(mData))
-        if (d->name == name)
-            return d;
-    return nullptr;
+    auto i = std::find_if(mData.begin(), mData.end(), [&name](Remote *r) {
+        return r->name == name;
+    });
+
+    if (i == mData.end())
+        return nullptr;
+    return *i;
 }
 
 void RemotesModel::rename(const QString &oldName, const QString &newName)

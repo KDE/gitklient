@@ -70,6 +70,7 @@ Log::Log(QString authorName,
     , mBody(std::move(body))
     , mCommitHash(std::move(commitHash))
     , mParentHash(std::move(parentHash))
+    , mType(NormalCommit)
 {
 }
 

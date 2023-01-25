@@ -16,7 +16,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #include <QDebug>
 
 BranchesStatusWidget::BranchesStatusWidget(Git::Manager *git, AppWindow *parent)
-    : WidgetBase(git, parent)
+    : WidgetBase{git, parent}
+    , mActions{new BranchActions{git, this}}
 
 {
     setupUi(this);
@@ -25,7 +26,6 @@ BranchesStatusWidget::BranchesStatusWidget(Git::Manager *git, AppWindow *parent)
 
 void BranchesStatusWidget::init(Git::Manager *git)
 {
-    mActions = new BranchActions(git, this);
     mModel = git->branchesModel();
     treeView->setModel(mModel);
 

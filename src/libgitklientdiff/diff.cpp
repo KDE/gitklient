@@ -202,11 +202,11 @@ void browseDir(QStringList &filesList, const QString &dirPath, const QString &ba
     }
 
     const auto dirs = d.entryList(QDir::NoDotAndDotDot | QDir::Dirs);
-    for (const auto &d : dirs) {
+    for (const auto &subDir : dirs) {
         if (dirPath.isEmpty())
-            browseDir(filesList, dirPath + d, basePath);
+            browseDir(filesList, dirPath + subDir, basePath);
         else
-            browseDir(filesList, dirPath + QLatin1Char('/') + d, basePath);
+            browseDir(filesList, dirPath + QLatin1Char('/') + subDir, basePath);
     }
 }
 

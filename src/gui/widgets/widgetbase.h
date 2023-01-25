@@ -41,10 +41,10 @@ public:
     virtual void restoreState(QSettings &settings);
 
     void save(QSettings &settings, QSplitter *splitter) const;
-    void restore(QSettings &settings, QSplitter *splitter);
+    void restore(const QSettings &settings, QSplitter *splitter);
 
     void save(QSettings &settings, QTreeView *treeView) const;
-    void restore(QSettings &settings, QTreeView *treeView);
+    void restore(const QSettings &settings, QTreeView *treeView);
 
     virtual void settingsUpdated();
 private Q_SLOTS:

@@ -65,13 +65,13 @@ struct LanesFactory {
         lanes.reserve(_hashes.size());
         for (const auto &hash : std::as_const(_hashes)) {
             if (hash == QString()) {
-                lanes.append(GraphLane::Transparent);
+                lanes.append(GraphLane{GraphLane::Transparent});
             } else {
                 if (hash == myHash) {
-                    lanes.append(GraphLane::Node);
+                    lanes.append(GraphLane{GraphLane::Node});
                     myIndex = index;
                 } else {
-                    lanes.append(hash == myHash ? GraphLane::Node : GraphLane::Pipe);
+                    lanes.append(GraphLane{GraphLane::Pipe});
                 }
             }
             index++;
@@ -109,7 +109,7 @@ struct LanesFactory {
     {
         Q_UNUSED(hash)
         _hashes.append(QString());
-        set(_hashes.size() - 1, GraphLane::Start, lanes);
+        set(_hashes.size() - 1, GraphLane{GraphLane::Start}, lanes);
     }
 
     void join(const QString &hash, QVector<GraphLane> &lanes, int &myIndex)
@@ -120,7 +120,7 @@ struct LanesFactory {
         for (auto i = list.begin(); i != list.end(); ++i) {
             if (firstIndex == -1) {
                 firstIndex = *i;
-                set(*i, list.contains(myIndex) ? GraphLane::Node : GraphLane::End, lanes);
+                set(*i, list.contains(myIndex) ? GraphLane{GraphLane::Node} : GraphLane{GraphLane::End}, lanes);
             } else {
                 auto lane = lanes.at(*i);
                 lane.mBottomJoins.append(firstIndex);

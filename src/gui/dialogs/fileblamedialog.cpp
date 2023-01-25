@@ -8,7 +8,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "gitmanager.h"
 #include "models/logsmodel.h"
-#include "qdebug.h"
 
 #include <KLocalizedString>
 #include <QThread>
@@ -43,7 +42,5 @@ void FileBlameDialog::loadData()
 void FileBlameDialog::slotPlainTextEditBlockSelected()
 {
     auto data = plainTextEdit->currentBlockData();
-    auto log = mGit->logsModel()->findLogByHash("05659b9f92b7932bb2c04ced181dbdde294cb0b");
-    qDebug() << log;
     logDetailsWidget->setLog(data ? static_cast<Git::Log *>(data->data) : nullptr);
 }

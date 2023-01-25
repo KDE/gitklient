@@ -564,6 +564,7 @@ Remote Manager::remoteDetails(const QString &remoteName)
 bool Manager::removeBranch(const QString &branchName) const
 {
     auto ret = readAllNonEmptyOutput({QStringLiteral("branch"), QStringLiteral("-D"), branchName});
+    Q_UNUSED(ret) // TODO: use ret!
     return true;
 }
 

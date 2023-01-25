@@ -21,7 +21,7 @@ class LIBGITKLIENT_EXPORT GraphLane
 public:
     enum Type { None, Start, Pipe, Node, End, Transparent, Test };
     GraphLane();
-    GraphLane(Type type);
+    explicit GraphLane(Type type);
 
     Q_REQUIRED_RESULT Type type() const;
     const QList<int> &bottomJoins() const;

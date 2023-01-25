@@ -79,8 +79,8 @@ QPoint centerGuide(int x, Qt::Edge edge)
 GraphPainter::GraphPainter(Git::LogsModel *model, QObject *parent)
     : QStyledItemDelegate(parent)
     , mModel(model)
+    , mColors{Qt::red, Qt::blue, Qt::darkGreen, Qt::magenta, Qt::darkMagenta, Qt::darkBlue, Qt::darkBlue, Qt::darkRed, Qt::darkYellow, Qt::darkGreen}
 {
-    mColors = {Qt::red, Qt::blue, Qt::darkGreen, Qt::magenta, Qt::darkMagenta, Qt::darkBlue, Qt::darkBlue, Qt::darkRed, Qt::darkYellow, Qt::darkGreen};
 }
 
 void GraphPainter::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

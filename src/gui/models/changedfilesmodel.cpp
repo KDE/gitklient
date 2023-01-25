@@ -68,6 +68,7 @@ void ChangedFilesModel::reload()
         const auto fileName = line.mid(3);
         Row d;
         d.filePath = fileName;
+        d.checked = false;
 
         if (status1 == QLatin1Char('M') || status0 == QLatin1Char('M'))
             d.status = Git::ChangeStatus::Modified;
@@ -188,9 +189,7 @@ const QList<ChangedFilesModel::Row> &ChangedFilesModel::data() const
 
 int ChangedFilesModel::checkedCount() const
 {
-    int ret{0};
-    for (const auto &row : mData)
-        if (row.checked)
-            ret++;
-    return ret;
+    return std::count_if(mData.begin(), mData.end(), [](const Row &row) {
+        return row.checked;
+    });
 }

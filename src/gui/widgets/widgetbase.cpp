@@ -77,7 +77,7 @@ void WidgetBase::save(QSettings &settings, QSplitter *splitter) const
     settings.setValue(stateName(splitter), splitter->saveState());
 }
 
-void WidgetBase::restore(QSettings &settings, QSplitter *splitter)
+void WidgetBase::restore(const QSettings &settings, QSplitter *splitter)
 {
     splitter->restoreState(settings.value(stateName(splitter)).toByteArray());
 }
@@ -87,7 +87,7 @@ void WidgetBase::save(QSettings &settings, QTreeView *treeView) const
     settings.setValue(stateName(treeView), treeView->header()->saveState());
 }
 
-void WidgetBase::restore(QSettings &settings, QTreeView *treeView)
+void WidgetBase::restore(const QSettings &settings, QTreeView *treeView)
 {
     treeView->header()->restoreState(settings.value(stateName(treeView)).toByteArray());
 }
