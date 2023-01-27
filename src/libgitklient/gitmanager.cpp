@@ -45,6 +45,7 @@ void Manager::setPath(const QString &newPath)
         loadAsync();
 
         setIsMerging(QFile::exists(mPath + QStringLiteral("/.git/MERGE_HEAD")));
+        setIsRebasing(QFile::exists(mPath + QStringLiteral("/.git/REBASE_HEAD")));
     }
 
     Q_EMIT pathChanged();
@@ -745,6 +746,19 @@ void Manager::setIsMerging(bool newIsMerging)
         return;
     m_isMerging = newIsMerging;
     Q_EMIT isMergingChanged();
+}
+
+bool Manager::isRebasing() const
+{
+    return m_isRebasing;
+}
+
+void Manager::setIsRebasing(bool newIsRebasing)
+{
+    if (m_isRebasing == newIsRebasing)
+        return;
+    m_isRebasing = newIsRebasing;
+    emit isRebasingChanged();
 }
 
 } // namespace Git
